@@ -1,0 +1,124 @@
+;; 前回Sessionの復元
+;; !! sjisで保存しないと、ロード処理で死ぬ
+;(load-file "C:\\Users\\mtsuchihashi\\Documents\\xyzzy\\default.ssn")
+;(load-file "C:\\doc\\ssn\\default.ssn")
+(load-file "C:\\Users\\mtsuchihashi\\xyzzy\\cnf\\ssn\\default.ssn")
+
+;; 日付をキャッシュ
+(setq *date-format* "%y%m%d")
+;;(setq *curr-date* (format-date-string *date-format*))
+
+;; isearch
+(require "isearch")
+
+;; Javascript関係
+(load-library "jscript-mode")
+       (export '(ed::*jscript-mode-map*
+                 ed::*jscript-mode-hook*
+                 ed::*jscript-indent-tabs-mode*
+                 ed::*jscript-comment-column*
+                 ed::*jscript-mode-script-host*
+                 ed::jscript-mode
+                 ed::jscript-comment-indent
+                 ed::jscript-mode-execute
+                 ed::jscript-mode-toggle-script-host) "ed")
+       (autoload 'jscript-mode "jscript-mode" t)
+
+
+
+;; Outline関係
+;; http://kamuycikap.hatenablog.com/entry/20091230/1262191457
+;;アウトラインプロセッサ機能を有効に
+(require "color")
+(require "win-window")
+(require "buf2html")
+(require "treeview/setup")
+(require "outline-tree/outline-tree")
+
+
+;;ディレクトリを自動で掘る
+;;(http://hie.s64.xrea.com/xyzzy/note/file-handling.html#make-directory-unless-directory-exists)
+(defun make-directory-unless-directory-exists (filename)
+  (unless (valid-path-p filename)
+    (let ((d (directory-namestring filename)))
+      (when (yes-or-no-p "~a~%ディレクトリがないけど作る？"  d)
+        (create-directory d))))
+  nil)
+; ファイルを開く前に実行
+(add-hook '*before-find-file-hook*
+          #'make-directory-unless-directory-exists)
+
+
+
+;; 原稿用紙枚数計算
+;(require count-util)
+
+
+(load-library "py-mode")
+(push '("\\.py$" . py-mode) *auto-mode-alist*)
+
+
+;; ==========================================================
+;;    キーバインド系
+;; ==========================================================
+
+;; 矩形選択関連
+;; http://d.hatena.ne.jp/sleepy_yoshi/20101121/p1
+(global-set-key '(#\C-x #\r #\t) 'string-rectangle)
+(global-set-key '(#\C-x #\r #\k) 'kill-rectangle)
+(global-set-key '(#\C-x #\r #\y) 'yank-rectangle)
+(global-set-key '(#\C-x #\r #\w) 'copy-rectangle)
+
+(global-set-key '(#\C-x #\M-S) 'shift-region)
+(global-set-key '(#\C-x #\M-U) 'unshift-region)
+
+;; emacsに合わせる
+(global-set-key '(#\C-_) 'undo)
+;; (global-set-key '(#\C-x #\u) 'undo)
+
+;;IME関係
+(global-set-key '(#\C-\\) 'toggle-ime)
+;; (defun toggle-on ()
+;;   (interactive)
+;;   (toggle-ime t))
+;; (defun toggle-off ()
+;;   (interactive)
+;;   (toggle-ime nil))
+;; (global-set-key '(#\M-k) 'toggle-on)
+;; (global-set-key '(#\M-a) 'toggle-off)
+
+
+
+;; grep
+(global-set-key '(#\C-x #\M-g) 'grep-dialog)
+(global-set-key '(#\C-x #\g) 'gresreg-dialog)
+
+;; Toggle Window Setting
+;; (defun toggle-hspc ()
+;;   (interactive)
+;;   (set-window-flags (logxor (get-window-flags) *window-flag-half-width-space*)))
+;; (defun toggle-tab ()
+;;   (interactive)
+;;   (set-window-flags (logxor (get-window-flags) *window-flag-tab*)))
+(global-set-key '(#\C-x #\SPC) 'toggle-half-width-space)
+(global-set-key '(#\C-x #\TAB) 'toggle-tab)
+
+
+
+;; TimeStamp機能
+(global-set-key '(#\C-x #\d) 'tstamp)
+(defun tstamp ()
+  (interactive)
+  ;; (insert *curr-date*))
+  (insert (format-date-string *date-format*)))
+
+
+
+;;(setq *default-fileio-encoding* *encoding-utf8*)
+
+;;(setq *initial-buffer-mode* 'fundamental-mode)
+
+;;(add-hook '*post-startup-hook*
+;;          #'(lambda ()
+;;              (set-buffer (find-buffer "*scratch*"))
+;;              (change-fileio-encoding *encoding-utf8*)))
